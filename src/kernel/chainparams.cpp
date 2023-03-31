@@ -84,7 +84,7 @@ public:
         // consensus.script_flag_exceptions.emplace( // Taproot exception
         //     uint256S("0x0000000000000000000f14c35b2d841e986ab5441de8c585d5ffe55ea1e395ad"), SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS);
         consensus.BIP34Height = 0;
-        consensus.BIP34Hash = uint256();
+        consensus.BIP34Hash = uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311");
         // consensus.BIP34Height = 227931;
         // consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
         consensus.BIP65Height = 0;          //
@@ -188,7 +188,7 @@ public:
 
         checkpointData = {
             {
-                {0, uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311")},
+                // {0, uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311")},
                 // {11111, uint256S("0x0000000069e244f73d78e8fd29ba2fd2ed618bd6fa2ee92559f542fdb26e7c1d")},
                 // {33333, uint256S("0x000000002dd5588a74784eaa7ab0507a18ad16a236e7b1ce69f00d7ddfb5d0a6")},
                 // {74000, uint256S("0x0000000000573993a3c9e41ce34471c079dcf5f52a0e824a81e7f953b8661a20")},
@@ -233,7 +233,7 @@ public:
         // consensus.script_flag_exceptions.emplace( // BIP16 exception
         //     uint256S("0x00000000dd30457c001f4095d208cc1296b0eed002427aa599874af7a432b105"), SCRIPT_VERIFY_NONE);
         consensus.BIP34Height = 0;
-        consensus.BIP34Hash = uint256();
+        consensus.BIP34Hash = uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311");
         consensus.BIP65Height = 0;          //
         consensus.BIP66Height = 0;          //
         consensus.CSVHeight = 0;            //
@@ -326,7 +326,7 @@ public:
 
         checkpointData = {
             {
-                {0, uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311")},
+                // {0, uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311")},
                 // {546, uint256S("000000002a936ca763904c3c35fce2f3556c559c0214345d31b1bcebf76acb70")},
             }};
 
@@ -399,7 +399,7 @@ public:
         consensus.nSubsidyHalvingInterval = 80000;
         // consensus.nSubsidyHalvingInterval = 210000;
         consensus.BIP34Height = 1;
-        consensus.BIP34Hash = uint256{};
+        consensus.BIP34Hash = uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311");
         consensus.BIP65Height = 1;
         consensus.BIP66Height = 1;
         consensus.CSVHeight = 1;
