@@ -25,14 +25,14 @@
 
 typedef std::map<int, uint256> MapCheckpoints;
 
-struct CCheckpointData {
-    MapCheckpoints mapCheckpoints;
+// struct CCheckpointData {
+//     MapCheckpoints mapCheckpoints;
 
-    int GetHeight() const {
-        const auto& final_checkpoint = mapCheckpoints.rbegin();
-        return final_checkpoint->first /* height */;
-    }
-};
+//     int GetHeight() const {
+//         const auto& final_checkpoint = mapCheckpoints.rbegin();
+//         return final_checkpoint->first /* height */;
+//     }
+// };
 
 struct AssumeutxoHash : public BaseHash<uint256> {
     explicit AssumeutxoHash(const uint256& hash) : BaseHash(hash) {}
@@ -121,7 +121,7 @@ public:
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
     const std::vector<uint8_t>& FixedSeeds() const { return vFixedSeeds; }
-    const CCheckpointData& Checkpoints() const { return checkpointData; }
+    // const CCheckpointData& Checkpoints() const { return checkpointData; }
 
     //! Get allowed assumeutxo configuration.
     //! @see ChainstateManager
@@ -179,7 +179,7 @@ protected:
     bool fRequireStandard;
     bool m_is_test_chain;
     bool m_is_mockable_chain;
-    CCheckpointData checkpointData;
+    // CCheckpointData checkpointData;
     MapAssumeutxo m_assumeutxo_data;
     ChainTxData chainTxData;
 };

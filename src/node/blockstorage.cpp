@@ -10,8 +10,8 @@
 #include <flatfile.h>
 #include <fs.h>
 #include <hash.h>
-#include <logging.h>
 #include <kernel/chainparams.h>
+#include <logging.h>
 #include <pow.h>
 #include <reverse_iterator.h>
 #include <shutdown.h>
@@ -231,7 +231,8 @@ void BlockManager::FindFilesToPrune(std::set<int>& setFilesToPrune, uint64_t nPr
              nLastBlockWeCanPrune, count);
 }
 
-void BlockManager::UpdatePruneLock(const std::string& name, const PruneLockInfo& lock_info) {
+void BlockManager::UpdatePruneLock(const std::string& name, const PruneLockInfo& lock_info)
+{
     AssertLockHeld(::cs_main);
     m_prune_locks[name] = lock_info;
 }
@@ -386,19 +387,19 @@ void BlockManager::ScanAndUnlinkAlreadyPrunedFiles()
     UnlinkPrunedFiles(block_files_to_prune);
 }
 
-const CBlockIndex* BlockManager::GetLastCheckpoint(const CCheckpointData& data)
-{
-    const MapCheckpoints& checkpoints = data.mapCheckpoints;
+// const CBlockIndex* BlockManager::GetLastCheckpoint(const CCheckpointData& data)
+// {
+//     const MapCheckpoints& checkpoints = data.mapCheckpoints;
 
-    for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints)) {
-        const uint256& hash = i.second;
-        const CBlockIndex* pindex = LookupBlockIndex(hash);
-        if (pindex) {
-            return pindex;
-        }
-    }
-    return nullptr;
-}
+//     for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints)) {
+//         const uint256& hash = i.second;
+//         const CBlockIndex* pindex = LookupBlockIndex(hash);
+//         if (pindex) {
+//             return pindex;
+//         }
+//     }
+//     return nullptr;
+// }
 
 bool BlockManager::IsBlockPruned(const CBlockIndex* pblockindex)
 {
@@ -435,8 +436,7 @@ void CleanupBlockRevFiles()
         const std::string path = fs::PathToString(it->path().filename());
         if (fs::is_regular_file(*it) &&
             path.length() == 12 &&
-            path.substr(8,4) == ".dat")
-        {
+            path.substr(8, 4) == ".dat") {
             if (path.substr(0, 3) == "blk") {
                 mapBlockFiles[path.substr(3, 5)] = it->path();
             } else if (path.substr(0, 3) == "rev") {
@@ -821,7 +821,7 @@ FlatFilePos BlockManager::SaveBlockToDisk(const CBlock& block, int nHeight, CCha
 {
     unsigned int nBlockSize = ::GetSerializeSize(block, CLIENT_VERSION);
     FlatFilePos blockPos;
-    const auto position_known {dbp != nullptr};
+    const auto position_known{dbp != nullptr};
     if (position_known) {
         blockPos = *dbp;
     } else {
