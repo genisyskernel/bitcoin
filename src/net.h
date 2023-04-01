@@ -9,7 +9,6 @@
 #include <chainparams.h>
 #include <common/bloom.h>
 #include <compat/compat.h>
-#include <node/connection_types.h>
 #include <consensus/amount.h>
 #include <crypto/siphash.h>
 #include <hash.h>
@@ -18,6 +17,7 @@
 #include <netaddress.h>
 #include <netbase.h>
 #include <netgroup.h>
+#include <node/connection_types.h>
 #include <policy/feerate.h>
 #include <protocol.h>
 #include <random.h>
@@ -65,9 +65,13 @@ static const unsigned int MAX_PROTOCOL_MESSAGE_LENGTH = 4 * 1000 * 1000;
 /** Maximum length of the user agent string in `version` message */
 static const unsigned int MAX_SUBVERSION_LENGTH = 256;
 /** Maximum number of automatic outgoing nodes over which we'll relay everything (blocks, tx, addrs, etc) */
-static const int MAX_OUTBOUND_FULL_RELAY_CONNECTIONS = 8;
+static const int MAX_OUTBOUND_FULL_RELAY_CONNECTIONS = 1;
 /** Maximum number of addnode outgoing nodes */
-static const int MAX_ADDNODE_CONNECTIONS = 8;
+static const int MAX_ADDNODE_CONNECTIONS = 1;
+// /** Maximum number of automatic outgoing nodes over which we'll relay everything (blocks, tx, addrs, etc) */
+// static const int MAX_OUTBOUND_FULL_RELAY_CONNECTIONS = 8;
+// /** Maximum number of addnode outgoing nodes */
+// static const int MAX_ADDNODE_CONNECTIONS = 8;
 /** Maximum number of block-relay-only outgoing connections */
 static const int MAX_BLOCK_RELAY_ONLY_CONNECTIONS = 2;
 /** Maximum number of feeler connections */
@@ -89,12 +93,11 @@ static constexpr bool DEFAULT_FORCEDNSSEED{false};
 static constexpr bool DEFAULT_DNSSEED{true};
 static constexpr bool DEFAULT_FIXEDSEEDS{true};
 static const size_t DEFAULT_MAXRECEIVEBUFFER = 5 * 1000;
-static const size_t DEFAULT_MAXSENDBUFFER    = 1 * 1000;
+static const size_t DEFAULT_MAXSENDBUFFER = 1 * 1000;
 
 typedef int64_t NodeId;
 
-struct AddedNodeInfo
-{
+struct AddedNodeInfo {
     std::string strAddedNode;
     CService resolvedAddress;
     bool fConnected;
@@ -134,8 +137,7 @@ void Discover();
 
 uint16_t GetListenPort();
 
-enum
-{
+enum {
     LOCAL_NONE,   // unknown
     LOCAL_IF,     // address a local interface listens on
     LOCAL_BIND,   // address explicit bound to
@@ -145,7 +147,7 @@ enum
     LOCAL_MAX
 };
 
-bool IsPeerAddrLocalGood(CNode *pnode);
+bool IsPeerAddrLocalGood(CNode* pnode);
 /** Returns a local address that we should advertise to this peer. */
 std::optional<CService> GetLocalAddrForPeer(CNode& node);
 
@@ -164,7 +166,7 @@ bool AddLocal(const CNetAddr& addr, int nScore = LOCAL_NONE);
 void RemoveLocal(const CService& addr);
 bool SeenLocal(const CService& addr);
 bool IsLocal(const CService& addr);
-bool GetLocal(CService &addr, const CNetAddr *paddrPeer = nullptr);
+bool GetLocal(CService& addr, const CNetAddr* paddrPeer = nullptr);
 CService GetLocalAddress(const CNetAddr& addrPeer);
 CService MaybeFlipIPv6toCJDNS(const CService& service);
 
@@ -227,7 +229,8 @@ public:
  * Ideally it should only contain receive time, payload,
  * type and size.
  */
-class CNetMessage {
+class CNetMessage
+{
 public:
     CDataStream m_recv;                  //!< received message data
     std::chrono::microseconds m_time{0}; //!< time of message receipt
@@ -255,7 +258,8 @@ public:
  * network receive buffer. It can deserialize the network buffer into a
  * transport protocol agnostic CNetMessage (message type & payload)
  */
-class TransportDeserializer {
+class TransportDeserializer
+{
 public:
     // returns true if the current deserialization is complete
     virtual bool Complete() const = 0;
@@ -275,10 +279,10 @@ private:
     const NodeId m_node_id; // Only for logging
     mutable CHash256 hasher;
     mutable uint256 data_hash;
-    bool in_data;                   // parsing header (false) or data (true)
-    CDataStream hdrbuf;             // partially received header
-    CMessageHeader hdr;             // complete header
-    CDataStream vRecv;              // received message data
+    bool in_data;       // parsing header (false) or data (true)
+    CDataStream hdrbuf; // partially received header
+    CMessageHeader hdr; // complete header
+    CDataStream vRecv;  // received message data
     unsigned int nHdrPos;
     unsigned int nDataPos;
 
@@ -286,7 +290,8 @@ private:
     int readHeader(Span<const uint8_t> msg_bytes);
     int readData(Span<const uint8_t> msg_bytes);
 
-    void Reset() {
+    void Reset()
+    {
         vRecv.clear();
         hdrbuf.clear();
         hdrbuf.resize(24);
@@ -333,20 +338,21 @@ public:
 
 /** The TransportSerializer prepares messages for the network transport
  */
-class TransportSerializer {
+class TransportSerializer
+{
 public:
     // prepare message for transport (header construction, error-correction computation, payload encryption, etc.)
     virtual void prepareForTransport(CSerializedNetMsg& msg, std::vector<unsigned char>& header) const = 0;
     virtual ~TransportSerializer() {}
 };
 
-class V1TransportSerializer : public TransportSerializer {
+class V1TransportSerializer : public TransportSerializer
+{
 public:
     void prepareForTransport(CSerializedNetMsg& msg, std::vector<unsigned char>& header) const override;
 };
 
-struct CNodeOptions
-{
+struct CNodeOptions {
     NetPermissionFlags permission_flags = NetPermissionFlags::None;
     std::unique_ptr<i2p::sam::Session> i2p_sam_session = nullptr;
     bool prefer_evict = false;
@@ -404,7 +410,8 @@ public:
      */
     std::string cleanSubVer GUARDED_BY(m_subver_mutex){};
     const bool m_prefer_evict{false}; // This peer is preferred for eviction.
-    bool HasPermission(NetPermissionFlags permission) const {
+    bool HasPermission(NetPermissionFlags permission) const
+    {
         return NetPermissions::HasFlag(m_permission_flags, permission);
     }
     /** fSuccessfullyConnected is set to true on receiving VERACK from the peer. */
@@ -440,55 +447,63 @@ public:
         mapSendBytesPerMsgType[msg_type] += sent_bytes;
     }
 
-    bool IsOutboundOrBlockRelayConn() const {
+    bool IsOutboundOrBlockRelayConn() const
+    {
         switch (m_conn_type) {
-            case ConnectionType::OUTBOUND_FULL_RELAY:
-            case ConnectionType::BLOCK_RELAY:
-                return true;
-            case ConnectionType::INBOUND:
-            case ConnectionType::MANUAL:
-            case ConnectionType::ADDR_FETCH:
-            case ConnectionType::FEELER:
-                return false;
+        case ConnectionType::OUTBOUND_FULL_RELAY:
+        case ConnectionType::BLOCK_RELAY:
+            return true;
+        case ConnectionType::INBOUND:
+        case ConnectionType::MANUAL:
+        case ConnectionType::ADDR_FETCH:
+        case ConnectionType::FEELER:
+            return false;
         } // no default case, so the compiler can warn about missing cases
 
         assert(false);
     }
 
-    bool IsFullOutboundConn() const {
+    bool IsFullOutboundConn() const
+    {
         return m_conn_type == ConnectionType::OUTBOUND_FULL_RELAY;
     }
 
-    bool IsManualConn() const {
+    bool IsManualConn() const
+    {
         return m_conn_type == ConnectionType::MANUAL;
     }
 
-    bool IsBlockOnlyConn() const {
+    bool IsBlockOnlyConn() const
+    {
         return m_conn_type == ConnectionType::BLOCK_RELAY;
     }
 
-    bool IsFeelerConn() const {
+    bool IsFeelerConn() const
+    {
         return m_conn_type == ConnectionType::FEELER;
     }
 
-    bool IsAddrFetchConn() const {
+    bool IsAddrFetchConn() const
+    {
         return m_conn_type == ConnectionType::ADDR_FETCH;
     }
 
-    bool IsInboundConn() const {
+    bool IsInboundConn() const
+    {
         return m_conn_type == ConnectionType::INBOUND;
     }
 
-    bool ExpectServicesFromConn() const {
+    bool ExpectServicesFromConn() const
+    {
         switch (m_conn_type) {
-            case ConnectionType::INBOUND:
-            case ConnectionType::MANUAL:
-            case ConnectionType::FEELER:
-                return false;
-            case ConnectionType::OUTBOUND_FULL_RELAY:
-            case ConnectionType::BLOCK_RELAY:
-            case ConnectionType::ADDR_FETCH:
-                return true;
+        case ConnectionType::INBOUND:
+        case ConnectionType::MANUAL:
+        case ConnectionType::FEELER:
+            return false;
+        case ConnectionType::OUTBOUND_FULL_RELAY:
+        case ConnectionType::BLOCK_RELAY:
+        case ConnectionType::ADDR_FETCH:
+            return true;
         } // no default case, so the compiler can warn about missing cases
 
         assert(false);
@@ -555,11 +570,13 @@ public:
     CNode(const CNode&) = delete;
     CNode& operator=(const CNode&) = delete;
 
-    NodeId GetId() const {
+    NodeId GetId() const
+    {
         return id;
     }
 
-    uint64_t GetLocalNonce() const {
+    uint64_t GetLocalNonce() const
+    {
         return nLocalHostNonce;
     }
 
@@ -612,7 +629,8 @@ public:
     std::string ConnectionTypeAsString() const { return ::ConnectionTypeAsString(m_conn_type); }
 
     /** A ping-pong round trip has completed successfully. Update latest and minimum ping times. */
-    void PongReceived(std::chrono::microseconds ping_time) {
+    void PongReceived(std::chrono::microseconds ping_time)
+    {
         m_last_ping_time = ping_time;
         m_min_ping_time = std::min(m_min_ping_time.load(), ping_time);
     }
@@ -665,20 +683,20 @@ public:
     virtual void FinalizeNode(const CNode& node) = 0;
 
     /**
-    * Process protocol messages received from a given node
-    *
-    * @param[in]   pnode           The node which we have received messages from.
-    * @param[in]   interrupt       Interrupt condition for processing threads
-    * @return                      True if there is more work to be done
-    */
+     * Process protocol messages received from a given node
+     *
+     * @param[in]   pnode           The node which we have received messages from.
+     * @param[in]   interrupt       Interrupt condition for processing threads
+     * @return                      True if there is more work to be done
+     */
     virtual bool ProcessMessages(CNode* pnode, std::atomic<bool>& interrupt) EXCLUSIVE_LOCKS_REQUIRED(g_msgproc_mutex) = 0;
 
     /**
-    * Send queued protocol messages to a given node.
-    *
-    * @param[in]   pnode           The node which we are sending messages to.
-    * @return                      True if there is more work to be done
-    */
+     * Send queued protocol messages to a given node.
+     *
+     * @param[in]   pnode           The node which we are sending messages to.
+     * @return                      True if there is more work to be done
+     */
     virtual bool SendMessages(CNode* pnode) EXCLUSIVE_LOCKS_REQUIRED(g_msgproc_mutex) = 0;
 
 
@@ -693,9 +711,7 @@ protected:
 class CConnman
 {
 public:
-
-    struct Options
-    {
+    struct Options {
         ServiceFlags nLocalServices = NODE_NONE;
         int nMaxConnections = 0;
         int m_max_outbound_full_relay = 0;
@@ -982,8 +998,8 @@ private:
     bool AlreadyConnectedToAddress(const CAddress& addr);
 
     bool AttemptToEvictConnection();
-    CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure, ConnectionType conn_type) EXCLUSIVE_LOCKS_REQUIRED(!m_unused_i2p_sessions_mutex);
-    void AddWhitelistPermissionFlags(NetPermissionFlags& flags, const CNetAddr &addr) const;
+    CNode* ConnectNode(CAddress addrConnect, const char* pszDest, bool fCountFailure, ConnectionType conn_type) EXCLUSIVE_LOCKS_REQUIRED(!m_unused_i2p_sessions_mutex);
+    void AddWhitelistPermissionFlags(NetPermissionFlags& flags, const CNetAddr& addr) const;
 
     void DeleteNode(CNode* pnode);
 
@@ -1013,11 +1029,11 @@ private:
     // Network usage totals
     mutable Mutex m_total_bytes_sent_mutex;
     std::atomic<uint64_t> nTotalBytesRecv{0};
-    uint64_t nTotalBytesSent GUARDED_BY(m_total_bytes_sent_mutex) {0};
+    uint64_t nTotalBytesSent GUARDED_BY(m_total_bytes_sent_mutex){0};
 
     // outbound limit & stats
-    uint64_t nMaxOutboundTotalBytesSentInCycle GUARDED_BY(m_total_bytes_sent_mutex) {0};
-    std::chrono::seconds nMaxOutboundCycleStartTime GUARDED_BY(m_total_bytes_sent_mutex) {0};
+    uint64_t nMaxOutboundTotalBytesSentInCycle GUARDED_BY(m_total_bytes_sent_mutex){0};
+    std::chrono::seconds nMaxOutboundCycleStartTime GUARDED_BY(m_total_bytes_sent_mutex){0};
     uint64_t nMaxOutboundLimit GUARDED_BY(m_total_bytes_sent_mutex);
 
     // P2P timeout in seconds
