@@ -211,9 +211,9 @@ public:
 
         chainTxData = ChainTxData{
             // Data from RPC: getchaintxstats 4096 00000000000000000009c97098b5295f7e5f183ac811fb5d1534040adb93cabd
-            .nTime = 1679858105,
-            .nTxCount = 1,
-            .dTxRate = 2.925802860942233,
+            // .nTime = 1679858105,
+            // .nTxCount = 1,
+            // .dTxRate = 2.925802860942233,
         };
     }
 };
@@ -325,11 +325,11 @@ public:
         m_is_test_chain = true;
         m_is_mockable_chain = false;
 
-        checkpointData = {
-            {
-                // {0, uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311")},
-                // {546, uint256S("000000002a936ca763904c3c35fce2f3556c559c0214345d31b1bcebf76acb70")},
-            }};
+        // checkpointData = {
+        //     {
+        //         {0, uint256S("0x0000000025e32f4eb9b2d6d9ca677893519a9e6041338b77b4aa7361b6c43311")},
+        //         {546, uint256S("000000002a936ca763904c3c35fce2f3556c559c0214345d31b1bcebf76acb70")},
+        //     }};
 
         m_assumeutxo_data = MapAssumeutxo{
             // TODO to be specified in a future patch.
@@ -561,10 +561,10 @@ public:
         m_is_test_chain = true;
         m_is_mockable_chain = true;
 
-        checkpointData = {
-            {
-                // {0, uint256S("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206")},
-            }};
+        // checkpointData = {
+        //     {
+        //         {0, uint256S("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206")},
+        //     }};
 
         m_assumeutxo_data = MapAssumeutxo{
             // {
